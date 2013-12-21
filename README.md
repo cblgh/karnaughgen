@@ -1,7 +1,9 @@
 karnaughgen
 ===========
 
-Generates LaTeX-code for Karnaugh maps.
+Generates LaTeX-code for Karnaugh maps using a GUI.
+
+Work in progress. LaTeX code generation not yet implemented.
 
 Requirements
 ------------
@@ -12,7 +14,6 @@ Requirements
  
 Licence
 -------
-Modified BSD License
 
 ```
 Copyright (c) 2013, Linus Karlsson
@@ -28,7 +29,7 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- * Neither the name of Linus Karlsson nor the names of its contributors may
+ * Neither the name of Linus Karlsson nor the names of the contributors may
    be used to endorse or promote products derived from this software without
    specific prior written permission.
 
