@@ -67,7 +67,7 @@ class MainFrame(QtGui.QMainWindow):
         vertices = self._karnaugh_map.selected_vertices()
         cube = self._validate_selection(vertices)
         # Add cube to implicant list.
-        self._implicant_list.addItem(cube)
+        self._implicant_list.add_implicant(cube)
 
     def _validate_selection(self, vertices):
         def is_power_of_two(num):
@@ -139,8 +139,22 @@ class KarnaughMap(QtGui.QTableWidget):
 
 class ImplicantList(QtGui.QListWidget):
 
+    VARIABLES = ['x1', 'x2', 'x3', 'x4']
+
     def __init__(self):
         super().__init__()
+
+    def add_implicant(self, cube):
+        """Add an implicant to the list."""
+        def variable(pos, value):
+            if value == '0':
+                return self.VARIABLES[pos] + "'"
+            elif value == '1':
+                return self.VARIABLES[pos]
+            else:
+                return ''
+        expr = ''.join(variable(i, v) for i, v in enumerate(cube))
+        self.addItem(expr)
 
 
 def main():
