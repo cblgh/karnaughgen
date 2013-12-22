@@ -9,7 +9,7 @@ Requirements
 ------------
 
  *  Python 3
- *  PyQt4
+ *  PySide
  *  The generated LaTeX-code requires Karnaugh.sty to be compiled to a document.
  
 Licence

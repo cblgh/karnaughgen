@@ -33,14 +33,14 @@ import itertools
 import math
 import sys
 
-from PyQt4 import QtCore, QtGui
+from PySide import QtCore, QtGui
 
 
 class MainFrame(QtGui.QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.resize(500, 300)
+        self.resize(500, 350)
         self.move(50, 50)
         self.setWindowTitle('KarnaughLaTeX generator')
         self._hbox = QtGui.QHBoxLayout()
@@ -57,6 +57,10 @@ class MainFrame(QtGui.QMainWindow):
         self._add_button.clicked.connect(self._add_implicant)
         self._vbox.addLayout(self._hbox, 1)
         self._vbox.addWidget(self._add_button)
+        # Generate LaTeX-code-button
+        self._generate_latex_button = QtGui.QPushButton('Generate LaTeX')
+        self._generate_latex_button.clicked.connect(self._generate_latex)
+        self._vbox.addWidget(self._generate_latex_button)
         # Cannot set layout on QMainWindow, so placeholder widget must be made.
         layout_widget = QtGui.QWidget()
         layout_widget.setLayout(self._vbox)
@@ -65,9 +69,15 @@ class MainFrame(QtGui.QMainWindow):
     def _add_implicant(self):
         # Fetch current selection, validate it, convert to a cube ({0, 1, B})
         vertices = self._karnaugh_map.selected_vertices()
-        cube = self._validate_selection(vertices)
-        # Add cube to implicant list.
-        self._implicant_list.add_implicant(cube)
+        if len(vertices) > 0:
+            cube = self._validate_selection(vertices)
+            # Add cube to implicant list.
+            self._implicant_list.add_implicant(cube)
+
+    def _generate_latex(self):
+        # Takes all implicants and generates LaTeX-code from them.
+        # Show the generated LaTeX-code in a new dialog.
+        pass
 
     def _validate_selection(self, vertices):
         def is_power_of_two(num):
@@ -155,6 +165,12 @@ class ImplicantList(QtGui.QListWidget):
                 return ''
         expr = ''.join(variable(i, v) for i, v in enumerate(cube))
         self.addItem(expr)
+
+
+class LaTeXGeneratorDialog(QtGui.QWidget):
+
+    def __init__(self, cubes):
+        pass
 
 
 def main():
