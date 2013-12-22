@@ -45,11 +45,13 @@ class MainFrame(QtGui.QMainWindow):
         self.setWindowTitle('KarnaughLaTeX generator')
         self._hbox = QtGui.QHBoxLayout()
         self._hbox.setContentsMargins(0, 0, 0, 0)
+        # A list of all stored cubes.
+        self._cubes = []
         # Karnaugh map
         self._karnaugh_map = KarnaughMap(4)
         self._hbox.addWidget(self._karnaugh_map)
         # Implicant list
-        self._implicant_list = ImplicantList()
+        self._implicant_list = ImplicantList(self._cubes)
         self._hbox.addWidget(self._implicant_list, QtCore.Qt.AlignRight)
         # Add implicant-button
         self._vbox = QtGui.QVBoxLayout()
@@ -72,12 +74,13 @@ class MainFrame(QtGui.QMainWindow):
         if len(vertices) > 0:
             cube = self._validate_selection(vertices)
             # Add cube to implicant list.
-            self._implicant_list.add_implicant(cube)
+            self._cubes.append(cube)
+            self._implicant_list.refresh_cubes()
 
     def _generate_latex(self):
-        # Takes all implicants and generates LaTeX-code from them.
-        # Show the generated LaTeX-code in a new dialog.
-        pass
+        """Takes all implicants and generates LaTeX code in a new dialog."""
+        self._dialog = LaTeXGeneratorDialog(self._cubes)
+        self._dialog.show()
 
     def _validate_selection(self, vertices):
         def is_power_of_two(num):
@@ -151,26 +154,52 @@ class ImplicantList(QtGui.QListWidget):
 
     VARIABLES = ['x1', 'x2', 'x3', 'x4']
 
-    def __init__(self):
+    def __init__(self, cubes):
         super().__init__()
+        self._cubes = cubes
 
-    def add_implicant(self, cube):
-        """Add an implicant to the list."""
+    def refresh_cubes(self):
+        """Show all implicants of the cube list in this QListWidget."""
         def variable(pos, value):
+            """Returns the variable as used in disjunctive form."""
             if value == '0':
                 return self.VARIABLES[pos] + "'"
             elif value == '1':
                 return self.VARIABLES[pos]
             else:
                 return ''
-        expr = ''.join(variable(i, v) for i, v in enumerate(cube))
-        self.addItem(expr)
+
+        def expr(cube):
+            return ''.join(variable(i, v) for i, v in enumerate(cube))
+        items = [expr(c) for c in self._cubes]
+        self.clear()
+        self.addItems(items)
+
+
+class LaTeXGenerator(object):
+
+    @staticmethod
+    def generate(cubes):
+        """Return the generated LaTeX code for the given cubes."""
+        return '\n'.join(cubes)
 
 
 class LaTeXGeneratorDialog(QtGui.QWidget):
 
     def __init__(self, cubes):
-        pass
+        super().__init__()
+        self.resize(400, 200)
+        self.move(100, 100)
+        font = QtGui.QFont("")
+        font.setStyleHint(QtGui.QFont.TypeWriter)
+        self.setFont(font)
+        text = LaTeXGenerator.generate(cubes)
+        text_edit = QtGui.QTextEdit()
+        text_edit.setPlainText(text)
+        vbox = QtGui.QVBoxLayout()
+        vbox.setContentsMargins(0, 0, 0, 0)
+        vbox.addWidget(text_edit)
+        self.setLayout(vbox)
 
 
 def main():
