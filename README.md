@@ -3,8 +3,6 @@ karnaughgen
 
 Generates LaTeX-code for Karnaugh maps using a GUI.
 
-Work in progress. LaTeX code generation not yet implemented.
-
 Requirements
 ------------
 

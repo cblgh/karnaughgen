@@ -179,15 +179,17 @@ class ImplicantList(QtGui.QListWidget):
 class LaTeXGenerator(object):
 
     @staticmethod
-    def generate(cubes):
+    def generate(cubes, values='101010'):
         """Return the generated LaTeX code for the given cubes."""
         # Ensure that all cubes have identical amount of variables, and that
         # the number of cubes is larger than 0.
         if not len({len(c) for c in cubes}) == 1:
             raise Exception("Invalid input cubes.")
-        # Try to locate a B0-sequence in the left-hand side variables.
-        code = (LaTeXGenerator.generate_cube(c) for c in cubes)
-        return '\n'.join(code)
+        implicants = '\n'.join(LaTeXGenerator.generate_cube(c) for c in cubes)
+        variables = len(cubes[0])
+        return '\n'.join([LaTeXGenerator.generate_header(variables, values),
+                          implicants,
+                          LaTeXGenerator.generate_footer()])
 
     @staticmethod
     def generate_cube(cube):
@@ -253,6 +255,19 @@ class LaTeXGenerator(object):
             # Ordinary cases here, no wraps.
             code.append(impl(xcoord(width), ycoord(height), width, height))
         return '\n'.join(code)
+
+    def generate_footer():
+        return '}\n\\end{picture}\n'
+
+    def generate_header(variables, values, ):
+        HEADER = ('\\begin{{picture}}(60,60)(0,0)\n'
+                  '\\put(0,10){{\n'
+                  '\\Karnaughdiagram{{{:d}}}{{{}}}(${}$, ${}$)[${}$]')
+        VARS = ['x_1', 'x_2', 'x_3', 'x_4']
+        left_vars = ' '.join(VARS[:variables//2])
+        top_vars = ' '.join(VARS[-variables//2:])
+        func = 'f'
+        return HEADER.format(variables, values, left_vars, top_vars, func)
 
 
 class LaTeXGeneratorDialog(QtGui.QWidget):

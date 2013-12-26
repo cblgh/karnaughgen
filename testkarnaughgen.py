@@ -82,5 +82,17 @@ class TestLaTeXGenerator(unittest.TestCase):
         expected = '\\PrimImpl(20,10)(18,18)'
         self.assertEqual(expected, karnaughgen.LaTeXGenerator.generate_cube(i))
 
+    def test_latex_generator(self):
+        i = ['BB1B', 'B01B']
+        expected = ('\\begin{picture}(60,60)(0,0)\n'
+                    '\\put(0,10){\n'
+                    '\\Karnaughdiagram{4}{101010}($x_1 x_2$, $x_3 x_4$)[$f$]\n'
+                    '\\PrimImpl(40,20)(18,38)\n'
+                    '\\PrimImpl(40,45)(18,28)[b]\n'
+                    '\\PrimImpl(40,-5)(18,28)[t]\n'
+                    '}\n'
+                    '\\end{picture}\n')
+        self.assertEqual(expected, karnaughgen.LaTeXGenerator.generate(i))
+
 if __name__ == '__main__':
     unittest.main()
