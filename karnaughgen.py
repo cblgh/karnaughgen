@@ -181,7 +181,89 @@ class LaTeXGenerator(object):
     @staticmethod
     def generate(cubes):
         """Return the generated LaTeX code for the given cubes."""
-        return '\n'.join(cubes)
+        # Ensure that all cubes have identical amount of variables, and that
+        # the number of cubes is larger than 0.
+        if not len({len(c) for c in cubes}) == 1:
+            raise Exception("Invalid input cubes.")
+        # Try to locate a B0-sequence in the left-hand side variables.
+        code = (LaTeXGenerator.generate_cube(c) for c in cubes)
+        return '\n'.join(code)
+
+    @staticmethod
+    def generate_cube(cube):
+        # Hard-code the special cases, that is the cases where we need to
+        # generate implicants going "over the edge".
+        # After checking for every weird case, just use general code to create
+        # a regular implicant (that is, a rectangle in the middle of the
+        # Karnaugh map)
+
+        # Assume there are 4 variables, x1x2 on the left-hand side, x3x4 on top
+        # We wrap around the edge as soon as any variable pair is B0.
+        # Example: 00B0 wrap left-right
+        # Example: B011 wrap top-bottom.
+        # Example: B0B0 wrap top-bottom and left-right.
+        # If there are 3 variables, assume x1 is the single left-hand variable
+        # This means that there cannot be any top-bottom wraps in this case.
+        # If there are 2 variables, no wraps can occur.
+        def coord(onetwovars):
+            m = {'00': 0,
+                 '01': 1,
+                 '11': 2,
+                 '10': 3,
+                 '0B': 0,
+                 '1B': 2,
+                 'B1': 1,
+                 'BB': 0}
+            return m['{:0>2}'.format(onetwovars)] * 10
+
+        def impl(x, y, width, height, mod=''):
+            # \PrimImpl(x,y)(w,h)[rlbt]
+            IMPL = '\\PrimImpl({:d},{:d})({:d},{:d})'
+            v = IMPL.format(x, y, width - 2, height - 2, mod)
+            return v if mod == '' else '{}[{}]'.format(v, mod)
+
+        variables = len(cube)
+        code = []
+        leftvars = cube[:variables//2]
+        topvars = cube[-variables//2:]
+        if variables == 4 and cube == 'B0B0':
+            # Special case, mark the four corners. Hard coded...
+            width = 30
+            height = 30
+            x_left = 5
+            x_right = 55
+            y_bottom = -5
+            y_top = 45
+            code.append(impl(x_left, y_top, width, height, 'rb'))
+            code.append(impl(x_right, y_top, width, height, 'lb'))
+            code.append(impl(x_left, y_bottom, width, height, 'rt'))
+            code.append(impl(x_right, y_bottom, width, height, 'lt'))
+        elif variables == 4 and leftvars == 'B0':
+            # Wrap top-bottom. Height will always be 20+10 for 3/4-vars + wrap.
+            width = (2 ** topvars.count('B')) * 10
+            height = 30
+            x = 10 + coord(topvars) + width//2
+            y_top = 45
+            y_bottom = -5
+            code.append(impl(x, y_top, width, height, 'b'))
+            code.append(impl(x, y_bottom, width, height, 't'))
+        elif variables >= 3 and topvars == 'B0':
+            # Wrap left-right.
+            width = 30
+            height = (2 ** leftvars.count('B')) * 10
+            x_left = 5
+            x_right = 55
+            y = 40 - coord(leftvars) - height//2
+            code.append(impl(x_left, y, width, height, 'r'))
+            code.append(impl(x_right, y, width, height, 'l'))
+        else:
+            # Ordinary cases here, no wraps at all, so just calculate as usual.
+            width = (2 ** topvars.count('B')) * 10
+            height = (2 ** leftvars.count('B')) * 10
+            x = 10 + coord(topvars) + width//2
+            y = 40 - coord(leftvars) - height//2
+            code.append(impl(x, y, width, height))
+        return '\n'.join(code)
 
 
 class LaTeXGeneratorDialog(QtGui.QWidget):
