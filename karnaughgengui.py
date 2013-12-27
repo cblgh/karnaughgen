@@ -55,8 +55,14 @@ class MainFrame(QtGui.QMainWindow):
         # Implicant list
         self._implicant_list = ImplicantList(self._cubes)
         self._hbox.addWidget(self._implicant_list, QtCore.Qt.AlignRight)
-        # Add implicant-button
+        # Variables combo box.
+        variables_combo = QtGui.QComboBox(self)
+        variables_combo.addItems(['{} variables'.format(i) for i in [2, 3, 4]])
+        variables_combo.setCurrentIndex(2)
+        variables_combo.activated.connect(self._set_variables)
         self._vbox = QtGui.QVBoxLayout()
+        self._vbox.addWidget(variables_combo)
+        # Add implicant-button
         self._add_button = QtGui.QPushButton('Add implicant')
         self._add_button.clicked.connect(self._add_implicant)
         self._vbox.addLayout(self._hbox, 1)
@@ -90,6 +96,12 @@ class MainFrame(QtGui.QMainWindow):
             self._dialog.show()
         except karnaughgen.KarnaughError as e:
             QtGui.QMessageBox.warning(self, 'Warning', str(e))
+
+    def _set_variables(self, index):
+        """Sets the variable count to 2, 3 or 4 variables."""
+        del self._cubes[:]  # Clear list while maintaing same object.
+        self._implicant_list.refresh_cubes()
+        self._karnaugh_map.set_variables(index + 2)
 
     def _validate_selection(self, vertices):
         def is_power_of_two(num):
@@ -128,13 +140,24 @@ class KarnaughMap(QtGui.QTableWidget):
     ROW_HEIGHT = 50
 
     def __init__(self, variables):
+        """Create table view with correct row and column count."""
+        super().__init__()
+        self.set_variables(variables)
+
+    def selected_vertices(self):
+        """Returns a set of vertices of the selected items."""
+        coords = ((i.row(), i.column()) for i in self.selectedIndexes())
+        return [self._left_values[r] + self._top_values[c] for r, c in coords]
+
+    def set_variables(self, variables):
+        """Resets the Karnaugh map and sets the correct variable count."""
         if variables > 4 or variables < 2:
             raise karnaughgen.KarnaughError('Illegal variable count. '
                                             'Must be between 2 and 4.')
         left_vars = (variables // 2) * 2
         top_vars = math.ceil(variables / 2) * 2
-        # Create table view with correct row and column count.
-        super().__init__(left_vars, top_vars)
+        self.setRowCount(left_vars)
+        self.setColumnCount(top_vars)
         self._set_headers(left_vars, top_vars)
         # Create cells, and set cell width equal to cell height for all cells.
         indices = itertools.product(range(0, left_vars), range(0, top_vars))
@@ -146,11 +169,6 @@ class KarnaughMap(QtGui.QTableWidget):
             self.setRowHeight(row, self.ROW_HEIGHT)
         for col in range(0, top_vars):
             self.setColumnWidth(col, self.rowHeight(0))
-
-    def selected_vertices(self):
-        """Returns a set of vertices of the selected items."""
-        coords = ((i.row(), i.column()) for i in self.selectedIndexes())
-        return [self._left_values[r] + self._top_values[c] for r, c in coords]
 
     def values(self):
         """Returns a list of all values entered in the Karnaugh map.

@@ -82,7 +82,7 @@ class TestLaTeXGenerator(unittest.TestCase):
         expected = '\\PrimImpl(20,10)(18,18)'
         self.assertEqual(expected, karnaughgen.LaTeXGenerator.generate_cube(i))
 
-    def test_latex_generator(self):
+    def test_latex_generator_4var(self):
         i = (['BB1B', 'B01B'], '0000000000000000')
         expected = ('\\begin{picture}(60,60)(0,0)\n'
                     '\\put(0,10){\n'
@@ -91,6 +91,31 @@ class TestLaTeXGenerator(unittest.TestCase):
                     '\\PrimImpl(40,20)(18,38)\n'
                     '\\PrimImpl(40,45)(18,28)[b]\n'
                     '\\PrimImpl(40,-5)(18,28)[t]\n'
+                    '}\n'
+                    '\\end{picture}\n')
+        self.assertEqual(expected, karnaughgen.LaTeXGenerator.generate(*i))
+
+    def test_latex_generator_3var(self):
+        i = (['BB1', '1B0'], '00000000')
+        expected = ('\\begin{picture}(60,60)(0,0)\n'
+                    '\\put(0,10){\n'
+                    '\\Karnaughdiagram{3}{00000000}'
+                    '($x_1$, $x_2 x_3$)[$f$]\n'
+                    '\\PrimImpl(30,10)(18,18)\n'
+                    '\\PrimImpl(5,5)(28,8)[r]\n'
+                    '\\PrimImpl(55,5)(28,8)[l]\n'
+                    '}\n'
+                    '\\end{picture}\n')
+        self.assertEqual(expected, karnaughgen.LaTeXGenerator.generate(*i))
+
+    def test_latex_generator_2var(self):
+        i = (['BB', '01'], '0000')
+        expected = ('\\begin{picture}(60,60)(0,0)\n'
+                    '\\put(0,10){\n'
+                    '\\Karnaughdiagram{2}{0000}'
+                    '($x_1$, $x_2$)[$f$]\n'
+                    '\\PrimImpl(20,10)(18,18)\n'
+                    '\\PrimImpl(25,15)(8,8)\n'
                     '}\n'
                     '\\end{picture}\n')
         self.assertEqual(expected, karnaughgen.LaTeXGenerator.generate(*i))

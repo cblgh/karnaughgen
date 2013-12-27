@@ -125,6 +125,6 @@ class LaTeXGenerator(object):
                   '\\Karnaughdiagram{{{:d}}}{{{}}}(${}$, ${}$)[${}$]')
         VARS = ['x_1', 'x_2', 'x_3', 'x_4']
         left_vars = ' '.join(VARS[:variables//2])
-        top_vars = ' '.join(VARS[-variables//2:])
+        top_vars = ' '.join(VARS[variables//2:variables])
         func = 'f'
         return HEADER.format(variables, values, left_vars, top_vars, func)
