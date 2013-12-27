@@ -9,7 +9,19 @@ Requirements
  *  Python 3
  *  PySide
  *  The generated LaTeX-code requires Karnaugh.sty to be compiled to a document.
- 
+
+Usage
+-----
+### GUI-version
+```
+python3 karnaughgengui.py
+```
+### TUI-version
+TODO
+
+### CLI-version
+TODO
+
 Licence
 -------
 
