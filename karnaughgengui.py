@@ -200,6 +200,11 @@ class ImplicantList(QtGui.QListWidget):
     def __init__(self, cubes):
         super().__init__()
         self._cubes = cubes
+        # React to both Delete and Backspace when deleting implicants.
+        shortcuts = [QtGui.QShortcut(QtGui.QKeySequence(k), self)
+                     for k in [QtCore.Qt.Key_Delete, QtCore.Qt.Key_Backspace]]
+        for s in shortcuts:
+            s.activated.connect(self._delete_current)
 
     def refresh_cubes(self):
         """Show all implicants of the cube list in this QListWidget."""
@@ -218,6 +223,11 @@ class ImplicantList(QtGui.QListWidget):
         items = [expr(c) for c in self._cubes]
         self.clear()
         self.addItems(items)
+
+    def _delete_current(self):
+        if self.currentRow() < self.count() and self.currentRow() != -1:
+            del self._cubes[self.currentRow()]
+            self.refresh_cubes()
 
 
 class LaTeXGeneratorDialog(QtGui.QWidget):
