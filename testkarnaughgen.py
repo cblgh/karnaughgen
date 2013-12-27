@@ -83,16 +83,17 @@ class TestLaTeXGenerator(unittest.TestCase):
         self.assertEqual(expected, karnaughgen.LaTeXGenerator.generate_cube(i))
 
     def test_latex_generator(self):
-        i = ['BB1B', 'B01B']
+        i = (['BB1B', 'B01B'], '0000000000000000')
         expected = ('\\begin{picture}(60,60)(0,0)\n'
                     '\\put(0,10){\n'
-                    '\\Karnaughdiagram{4}{101010}($x_1 x_2$, $x_3 x_4$)[$f$]\n'
+                    '\\Karnaughdiagram{4}{0000000000000000}'
+                    '($x_1 x_2$, $x_3 x_4$)[$f$]\n'
                     '\\PrimImpl(40,20)(18,38)\n'
                     '\\PrimImpl(40,45)(18,28)[b]\n'
                     '\\PrimImpl(40,-5)(18,28)[t]\n'
                     '}\n'
                     '\\end{picture}\n')
-        self.assertEqual(expected, karnaughgen.LaTeXGenerator.generate(i))
+        self.assertEqual(expected, karnaughgen.LaTeXGenerator.generate(*i))
 
 if __name__ == '__main__':
     unittest.main()

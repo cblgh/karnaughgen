@@ -79,7 +79,8 @@ class MainFrame(QtGui.QMainWindow):
 
     def _generate_latex(self):
         """Takes all implicants and generates LaTeX code in a new dialog."""
-        self._dialog = LaTeXGeneratorDialog(self._cubes)
+        values = self._karnaugh_map.values()
+        self._dialog = LaTeXGeneratorDialog(self._cubes, values)
         self._dialog.show()
 
     def _validate_selection(self, vertices):
@@ -140,6 +141,19 @@ class KarnaughMap(QtGui.QTableWidget):
         coords = ((i.row(), i.column()) for i in self.selectedIndexes())
         return [self._left_values[r] + self._top_values[c] for r, c in coords]
 
+    def values(self):
+        """Returns a list of all values entered in the Karnaugh map.
+
+        Uses natural ordering, such that e.g. 1111 is the last item of the list
+        """
+        coords = itertools.product(range(0, len(self._left_values)),
+                                   range(0, len(self._top_values)))
+        values = {}
+        for r, c in coords:
+            graycode = self._left_values[r] + self._top_values[c]
+            values[graycode] = self.item(r, c).text()
+        return [v for k, v in sorted(values.items())]
+
     def _set_headers(self, left_vars, top_vars):
         # left_vars and top_vars will only be 2 or 4.
         two_var = ['0', '1']
@@ -179,15 +193,19 @@ class ImplicantList(QtGui.QListWidget):
 class LaTeXGenerator(object):
 
     @staticmethod
-    def generate(cubes, values='101010'):
+    def generate(cubes, values):
         """Return the generated LaTeX code for the given cubes."""
         # Ensure that all cubes have identical amount of variables, and that
-        # the number of cubes is larger than 0.
+        # the number of cubes is larger than 0. Also ensure that the length
+        # of values matches the amount of variable combinations.
         if not len({len(c) for c in cubes}) == 1:
             raise Exception("Invalid input cubes.")
+        if not 2 ** len(cubes[0]) == len(values):
+            raise Exception("Invalid length of input values.")
         implicants = '\n'.join(LaTeXGenerator.generate_cube(c) for c in cubes)
         variables = len(cubes[0])
-        return '\n'.join([LaTeXGenerator.generate_header(variables, values),
+        valstr = ''.join(values)
+        return '\n'.join([LaTeXGenerator.generate_header(variables, valstr),
                           implicants,
                           LaTeXGenerator.generate_footer()])
 
@@ -272,14 +290,14 @@ class LaTeXGenerator(object):
 
 class LaTeXGeneratorDialog(QtGui.QWidget):
 
-    def __init__(self, cubes):
+    def __init__(self, cubes, values):
         super().__init__()
         self.resize(400, 200)
         self.move(100, 100)
         font = QtGui.QFont("")
         font.setStyleHint(QtGui.QFont.TypeWriter)
         self.setFont(font)
-        text = LaTeXGenerator.generate(cubes)
+        text = LaTeXGenerator.generate(cubes, values)
         text_edit = QtGui.QTextEdit()
         text_edit.setPlainText(text)
         vbox = QtGui.QVBoxLayout()
