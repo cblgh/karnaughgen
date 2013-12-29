@@ -29,6 +29,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import division
+
 import itertools
 import math
 import sys
@@ -41,7 +43,7 @@ import karnaughgen
 class MainFrame(QtGui.QMainWindow):
 
     def __init__(self):
-        super().__init__()
+        super(MainFrame, self).__init__()
         self.resize(500, 350)
         self.move(50, 50)
         self.setWindowTitle('KarnaughLaTeX generator')
@@ -141,7 +143,7 @@ class KarnaughMap(QtGui.QTableWidget):
 
     def __init__(self, variables):
         """Create table view with correct row and column count."""
-        super().__init__()
+        super(KarnaughMap, self).__init__()
         self.set_variables(variables)
 
     def selected_vertices(self):
@@ -155,7 +157,7 @@ class KarnaughMap(QtGui.QTableWidget):
             raise karnaughgen.KarnaughError('Illegal variable count. '
                                             'Must be between 2 and 4.')
         left_vars = (variables // 2) * 2
-        top_vars = math.ceil(variables / 2) * 2
+        top_vars = int(math.ceil(variables / 2)) * 2
         self.setRowCount(left_vars)
         self.setColumnCount(top_vars)
         self._set_headers(left_vars, top_vars)
@@ -198,7 +200,7 @@ class ImplicantList(QtGui.QListWidget):
     VARIABLES = ['x1', 'x2', 'x3', 'x4']
 
     def __init__(self, cubes):
-        super().__init__()
+        super(ImplicantList, self).__init__()
         self._cubes = cubes
         # React to both Delete and Backspace when deleting implicants.
         shortcuts = [QtGui.QShortcut(QtGui.QKeySequence(k), self)
@@ -233,7 +235,7 @@ class ImplicantList(QtGui.QListWidget):
 class LaTeXGeneratorDialog(QtGui.QWidget):
 
     def __init__(self, cubes, values):
-        super().__init__()
+        super(LaTeXGeneratorDialog, self).__init__()
         self.resize(400, 200)
         self.move(100, 100)
         font = QtGui.QFont("")
