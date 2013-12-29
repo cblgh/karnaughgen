@@ -1,24 +1,20 @@
 karnaughgen
 ===========
 
-Generates LaTeX-code for Karnaugh maps using a GUI.
+Generates LaTeX-code for Karnaugh maps using either a GUI or a CLI.
 
 Requirements
 ------------
 
  *  Python 2 or 3
  *  The generated LaTeX-code requires Karnaugh.sty to be compiled to a document.
-
-### GUI-version
-
- *  Python 3 only
- *  PySide
+ *  PySide *(GUI-version only)*
 
 Usage
 -----
 ### GUI-version
 ```
-python3 karnaughgen-gui.py
+python karnaughgen-gui.py
 ```
 
 ### CLI-version
