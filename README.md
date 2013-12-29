@@ -6,21 +6,48 @@ Generates LaTeX-code for Karnaugh maps using a GUI.
 Requirements
 ------------
 
- *  Python 3
- *  PySide
+ *  Python 2 or 3
  *  The generated LaTeX-code requires Karnaugh.sty to be compiled to a document.
+
+### GUI-version
+
+ *  Python 3 only
+ *  PySide
 
 Usage
 -----
 ### GUI-version
 ```
-python3 karnaughgengui.py
+python3 karnaughgen-gui.py
 ```
-### TUI-version
-TODO
 
 ### CLI-version
-TODO
+```
+usage: karnaughgen-cli.py [-h] [-v VALUES] CUBE [CUBE ...]
+
+Generates LaTeX code for Karnaugh maps.
+
+positional arguments:
+  CUBE                  A space-separated list of cubes for each implicant
+                        that should be included in the output. A cube is a
+                        string of 2-4 chars from the set {0, 1, B}. Examples:
+                        0B01, BB10, B10, 0B.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v VALUES, --values VALUES
+                        The values of the function f. Expected input is a
+                        string of length 4, 8, or 16, corresponding to the
+                        number of variables (2, 3, or 4). The function values
+                        should be in natural order. Defaults to all zero. To
+                        pass don't care terms, use the syntax --values=-1-1
+                        (note the equal sign (=)) to avoid the parser to
+                        interpret it as an option.
+
+examples:
+  karnaughgen-cli.py B001
+  karnaughgen-cli.py -v=-1-11-1-00000001 0BBB B111
+```
 
 Licence
 -------

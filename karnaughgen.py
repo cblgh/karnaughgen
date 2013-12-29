@@ -116,9 +116,11 @@ class LaTeXGenerator(object):
             code.append(impl(xcoord(width), ycoord(height), width, height))
         return '\n'.join(code)
 
+    @staticmethod
     def generate_footer():
         return '}\n\\end{picture}\n'
 
+    @staticmethod
     def generate_header(variables, values, ):
         HEADER = ('\\begin{{picture}}(60,60)(0,0)\n'
                   '\\put(0,10){{\n'
